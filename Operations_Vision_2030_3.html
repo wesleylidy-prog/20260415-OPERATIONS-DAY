@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operations Vision 2030</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#FAF8F5;color:#1a1a1a;min-height:100vh}
+.header{background:#B85042;padding:18px 16px 14px;text-align:center;position:sticky;top:0;z-index:100}
+.header h1{color:#fff;font-size:20px;font-weight:700;margin-bottom:2px}
+.header p{color:#ffcccc;font-size:12px}
+.tabs{display:flex;gap:0;background:#a04538;justify-content:center;position:sticky;top:54px;z-index:99;flex-wrap:wrap}
+.tab{padding:10px 18px;color:#ffcccc;font-size:13px;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
+.tab:hover{color:#fff}
+.tab.active{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,.1)}
+.container{max-width:700px;margin:0 auto;padding:20px 16px}
+.section{display:none}
+.section.active{display:block}
+.card{background:#fff;border-radius:12px;border:1px solid #e8e5e0;padding:16px 18px;margin-bottom:12px}
+.card-accent{border-left:4px solid;border-radius:0}
+
+/* Agenda */
+.agenda-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f0efec}
+.agenda-item:last-child{border-bottom:none}
+.ag-time{min-width:70px;text-align:center}
+.ag-time .start{font-size:16px;font-weight:700;color:#B85042}
+.ag-time .end{font-size:11px;color:#999}
+.ag-body{flex:1}
+.ag-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.ag-meta{font-size:11px;color:#999}
+.ag-meta span{margin-right:12px}
+.ag-ws{background:#f0f7ff;border-radius:8px;padding:8px 12px;margin-top:4px;font-size:12px;color:#1C7293}
+.ag-break{color:#999;font-style:italic}
+
+/* Rules */
+.rule-card{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #f0efec}
+.rule-card:last-child{border-bottom:none}
+.rule-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.rule-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.rule-desc{font-size:13px;color:#555}
+.rule-tip{font-size:11px;color:#999;font-style:italic;margin-top:2px}
+
+/* Whiteboard guide */
+.wb-card{background:#fff;border-radius:10px;border:1px solid #e8e5e0;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.wb-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.wb-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.wb-steps{font-size:13px;color:#555}
+.wb-tip{font-size:11px;padding:4px 10px;border-radius:6px;margin-top:6px;display:inline-block;font-style:italic}
+
+/* Search */
+.search-box{position:relative;margin-bottom:16px}
+.search-box input{width:100%;padding:14px 16px;font-size:16px;border:1.5px solid #ddd;border-radius:12px;background:#fff;outline:none;transition:border .2s}
+.search-box input:focus{border-color:#B85042}
+.dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e0e0e0;border-radius:10px;margin-top:4px;overflow:hidden;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.dd-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:background .15s}
+.dd-item:hover{background:#f8f7f4}
+.dd-item:last-child{border-bottom:none}
+.dd-name{font-weight:600;font-size:14px}
+.dd-dept{color:#999;font-size:12px;margin-left:8px}
+.person-hd{text-align:center;margin-bottom:16px}
+.avatar{width:48px;height:48px;border-radius:50%;background:#B85042;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;margin-bottom:6px}
+.p-name{font-size:18px;font-weight:600}
+.p-dept{font-size:13px;color:#999}
+.sess-lbl{font-size:13px;font-weight:600;margin-bottom:6px;padding:4px 10px;border-radius:6px;display:inline-block}
+.sess1{background:#E6F1FB;color:#1C7293}
+.sess2{background:#EAF3DE;color:#27AE60}
+.ws-card2{border-radius:10px;padding:14px 16px;margin-bottom:12px;border:1.5px solid}
+.ws-card2 .wst{font-size:15px;font-weight:700;margin-bottom:6px}
+.ws-card2 .wsd{font-size:13px;margin-bottom:2px}
+.ws-card2 .wsd b{font-weight:600}
+.captain-b{margin-top:8px;background:#FEF9E7;border:1.5px solid #F1C40F;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;color:#7D6E08;text-align:center}
+.no-ws{background:#f5f4f0;border-radius:10px;padding:14px;text-align:center;color:#999;font-size:13px;margin-bottom:12px}
+.empty-st{background:#fff;border-radius:14px;padding:28px 20px;text-align:center;border:1px solid #e8e5e0}
+.empty-st p{color:#888;font-size:14px;margin-bottom:12px}
+.ws-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.ws-tg{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid}
+.all-btn{background:none;border:1px solid #ddd;border-radius:8px;padding:8px 16px;font-size:13px;color:#888;cursor:pointer;width:100%;margin-top:8px}
+.all-btn:hover{background:#f8f7f4}
+.mini-t{width:100%;border-collapse:collapse;margin-top:12px;font-size:11px}
+.mini-t th{background:#f0efec;padding:7px 8px;text-align:left;font-weight:600;color:#555;border-bottom:1px solid #e0e0e0}
+.mini-t td{padding:6px 8px;border-bottom:1px solid #f0f0f0}
+.mini-t tr:hover{background:#faf8f5}
+.mini-t .cap{background:#FEF9E7;font-weight:600}
+
+/* QR */
+.qr-section{text-align:center;margin:20px 0;padding:20px;background:#fff;border-radius:12px;border:1px solid #e8e5e0}
+.qr-section canvas{margin:10px auto;display:block}
+.qr-section p{font-size:12px;color:#999;margin-top:8px}
+
+/* Compass */
+.cp-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.cp-metric{background:#fff;border-radius:10px;border:1px solid #e8e5e0;padding:10px 14px;text-align:center}
+.cp-metric .val{font-size:22px;font-weight:700}
+.cp-metric .lbl{font-size:11px;color:#999}
+.cp-cat{border-radius:0;margin-bottom:12px;padding:14px 16px;background:#fff;border:1px solid #e8e5e0}
+.cp-cat-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer}
+.cp-cat-hd .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cp-cat-hd .title{font-size:15px;font-weight:600;flex:1}
+.cp-cat-hd .badge{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:600}
+.cp-cat-hd .arrow{font-size:14px;color:#999;transition:transform .2s}
+.cp-pillar-hd{display:flex;align-items:center;gap:6px;margin:8px 0 2px;padding-left:4px}
+.cp-pillar-hd .pname{font-size:13px;font-weight:600;flex:1}
+.cp-pillar-hd .ptag{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500}
+.cp-insight{border-top:1px solid #f0efec;padding-top:10px;margin-top:8px}
+.cp-insight-section{margin-bottom:8px}
+.cp-insight-label{font-size:11px;font-weight:600;margin-bottom:4px}
+.cp-insight-item{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start}
+.cp-insight-item .idot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.cp-insight-item .ititle{font-size:12px;font-weight:600}
+.cp-insight-item .itext{font-size:12px;color:#777;line-height:1.5}
+
+.footer{text-align:center;padding:16px;font-size:11px;color:#bbb}
+@media(max-width:480px){.header h1{font-size:17px}.tab{padding:8px 12px;font-size:12px}.container{padding:16px 10px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Operations Vision 2030</h1>
+  <p>15 April 2025 &mdash; Pontoise</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('agenda')">Agenda</div>
+  <div class="tab" onclick="showTab('rules')">Workshop Rules</div>
+  <div class="tab" onclick="showTab('whiteboard')">Whiteboard Guide</div>
+  <div class="tab" onclick="showTab('groups')">My Workshops</div>
+  <div class="tab" onclick="showTab('compass')">Leadership Compass</div>
+</div>
+
+<!-- ============ AGENDA ============ -->
+<div class="container">
+<div id="tab-agenda" class="section active">
+  <div class="qr-section">
+    <p style="font-weight:600;color:#B85042;font-size:14px;margin-bottom:8px">Scan to access this page on your phone</p>
+    <canvas id="qrCanvas"></canvas>
+    <p>Or share this link with participants</p>
+  </div>
+
+  <div class="card">
+    <div id="agendaList"></div>
+  </div>
+</div>
+
+<!-- ============ RULES ============ -->
+<div id="tab-rules" class="section">
+  <div class="card" style="margin-bottom:14px">
+    <h3 style="color:#B85042;font-size:16px;margin-bottom:4px">Workshop Purpose</h3>
+    <p style="font-size:13px;color:#555;margin-bottom:10px">Collaborate on 4 strategic topics to shape our Operations roadmap for 2030.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <span class="ws-tg" style="background:#E6F1FB;border-color:#1C7293;color:#0C447C">Session 1: WS1 Digitalization | WS2 Forecast</span>
+      <span class="ws-tg" style="background:#EAF3DE;border-color:#27AE60;color:#27500A">Session 2: WS3 Supplier Sync | WS4 Leadership</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;justify-content:center">
+      <span style="background:#1C7293;color:#fff;padding:5px 14px;border-radius:8px;font-size:11px;font-weight:600">SESSION 1 | 13:45-14:45</span>
+      <span style="color:#ccc">&rarr;</span>
+      <span style="background:#27AE60;color:#fff;padding:5px 14px;border-radius:8px;font-size:11px;font-weight:600">SESSION 2 | 14:45-15:45</span>
+    </div>
+    <p style="text-align:center;font-size:12px;color:#C0392B;font-weight:600;margin-top:8px">&#9888; No break between the 2 workshops</p>
+  </div>
+
+  <div class="card" id="rulesList"></div>
+</div>
+
+<!-- ============ WHITEBOARD GUIDE ============ -->
+<div id="tab-whiteboard" class="section">
+  <div id="wbList"></div>
+</div>
+
+<!-- ============ GROUPS ============ -->
+<div id="tab-groups" class="section">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Type your name to find your workshops..." autocomplete="off"/>
+    <div id="dropdown" class="dropdown" style="display:none"></div>
+  </div>
+  <div id="result"></div>
+  <div id="emptyState" class="empty-st">
+    <p>Start typing your name above to find your workshop assignments</p>
+    <div class="ws-tags">
+      <span class="ws-tg" style="background:#E6F1FB;border-color:#1C7293;color:#0C447C">WS1: Digitalization</span>
+      <span class="ws-tg" style="background:#FAECE7;border-color:#B85042;color:#712B13">WS2: Forecast</span>
+      <span class="ws-tg" style="background:#EAF3DE;border-color:#27AE60;color:#27500A">WS3: Supplier Sync</span>
+      <span class="ws-tg" style="background:#F4ECF7;border-color:#8E44AD;color:#3C3489">WS4: Leadership</span>
+    </div>
+    <button class="all-btn" onclick="toggleFullList()">Show full participant list</button>
+    <div id="fullList" style="display:none"></div>
+  </div>
+</div>
+<!-- ============ COMPASS ============ -->
+<div id="tab-compass" class="section">
+  <div class="cp-summary">
+    <div class="cp-metric"><div class="lbl">Global CODIR (n=27)</div><div class="val" style="color:#B85042">3.06</div></div>
+    <div class="cp-metric"><div class="lbl">Global TEAM (n=23)</div><div class="val" style="color:#1C7293">2.75</div></div>
+  </div>
+  <div id="compassCharts"></div>
+</div>
+</div>
+
+<div class="footer">Operations Vision 2030 &mdash; Clarins &mdash; 15 April 2025</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script>
+// ===== TAB NAVIGATION =====
+function showTab(id){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(function(t){if(t.textContent.toLowerCase().replace(/\s/g,'').indexOf(id)>=0||
+    (id==='agenda'&&t.textContent==='Agenda')||
+    (id==='rules'&&t.textContent==='Workshop Rules')||
+    (id==='whiteboard'&&t.textContent==='Whiteboard Guide')||
+    (id==='groups'&&t.textContent==='My Workshops')||
+    (id==='compass'&&t.textContent==='Leadership Compass'))t.classList.add('active')});
+}
+
+// ===== QR CODE =====
+try{
+  var qr=new QRious({element:document.getElementById('qrCanvas'),value:'https://wesleylidy-prog.github.io/20260415-OPERATIONS-DAY/Operations_Vision_2030_1.html',size:180,backgroundAlpha:0,foreground:'#B85042',level:'M'});
+}catch(e){}
+
+// ===== AGENDA DATA =====
+var agenda=[
+  {s:"08:30",e:"09:00",t:"Welcome Coffee",w:"Bambou",l:"",c:"#8D6E63",brk:false},
+  {s:"09:00",e:"09:30",t:"Kick Off",w:"Pepiniere",l:"Wesley Lidy",c:"#B85042",brk:false},
+  {s:"09:30",e:"10:00",t:"2025 Quick Wins Status Review",w:"Pepiniere",l:"Wesley Lidy + Philippe Briand",c:"#B85042",brk:false},
+  {s:"10:00",e:"11:15",t:"Operations Vision 2030 Sharing",w:"Pepiniere",l:"Guillaume Scolan",c:"#B85042",brk:false},
+  {s:"11:15",e:"11:30",t:"Break",w:"",l:"",c:"#bbb",brk:true},
+  {s:"11:30",e:"12:30",t:"Clarins Digital Ambition",w:"Pepiniere",l:"Laurent Malaveille",c:"#1C7293",brk:false},
+  {s:"12:30",e:"13:30",t:"Lunch \u2014 Buffet",w:"Bambou",l:"",c:"#8D6E63",brk:false},
+  {s:"13:30",e:"13:45",t:"Workshop Purpose & Rules",w:"Pepiniere",l:"Wesley Lidy",c:"#27AE60",brk:false},
+  {s:"13:45",e:"14:45",t:"Session 1",w:"See Rooms / Pepiniere",l:"W. Lidy \u2022 S. Louerat \u2022 S. Martin",c:"#1C7293",brk:false,ws:"WS1: Digitalization | WS2: Forecast Deployment"},
+  {s:"14:45",e:"15:45",t:"Session 2",w:"Pepiniere / See Rooms",l:"J. Belin \u2022 S. Martin \u2022 S. Petitcollin \u2022 W. Lidy",c:"#27AE60",brk:false,ws:"WS3: Supplier Sync | WS4: Leadership Compass"},
+  {s:"15:45",e:"16:45",t:"Workshop Outcome",w:"Pepiniere",l:"Workshop Leaders",c:"#8E44AD",brk:false},
+  {s:"16:45",e:"17:00",t:"Conclusion \u2014 Wrap up \u2014 Next Steps",w:"Pepiniere",l:"G. Scolan \u2022 W. Lidy",c:"#8E44AD",brk:false},
+  {s:"17:00",e:"18:00",t:"End of the Day Drink",w:"Pepiniere",l:"",c:"#E67E22",brk:false,ws:"SC Leaders \u2014 Topics of Interest (Christophine, COMAN)"},
+];
+
+var agH='';
+agenda.forEach(function(a){
+  agH+='<div class="agenda-item"><div class="ag-time"><div class="start" style="color:'+a.c+'">'+a.s+'</div><div class="end">'+a.e+'</div></div><div class="ag-body">';
+  agH+='<div class="ag-title'+(a.brk?' ag-break':'')+'">'+a.t+'</div>';
+  if(a.w||a.l)agH+='<div class="ag-meta">'+(a.w?'<span>'+a.w+'</span>':'')+(a.l?'<span>'+a.l+'</span>':'')+'</div>';
+  if(a.ws)agH+='<div class="ag-ws">'+a.ws+'</div>';
+  agH+='</div></div>';
+});
+document.getElementById('agendaList').innerHTML=agH;
+
+// ===== RULES =====
+var rules=[
+  {n:"1",c:"#1C7293",t:"Digital platform",d:"All workshops run on Teams Whiteboard. Your group\u2019s digital board is ready \u2014 just add your post-its.",tip:""},
+  {n:"2",c:"#27AE60",t:"Go to your assigned room",d:"Split into groups in the allocated rooms. The platform captain (in yellow) guides the board.",tip:""},
+  {n:"3",c:"#E67E22",t:"Follow the timer",d:"A shared timer signals the end of each workshop. Start workshop 2 immediately when the timer rings.",tip:"No break between the 2 workshops!"},
+  {n:"4",c:"#8E44AD",t:"Prepare your restitution",d:"Each group prepares a 3-minute summary. Show your key post-its on the digital platform.",tip:""},
+  {n:"5",c:"#B85042",t:"Captains lead the board",d:"The captain (highlighted in yellow) manages the Whiteboard. Others focus on contributing ideas via post-its.",tip:""},
+];
+
+var ruH='';
+rules.forEach(function(r){
+  ruH+='<div class="rule-card"><div class="rule-num" style="background:'+r.c+'">'+r.n+'</div><div><div class="rule-title" style="color:'+r.c+'">'+r.t+'</div><div class="rule-desc">'+r.d+'</div>';
+  if(r.tip)ruH+='<div class="rule-tip" style="color:'+r.c+';font-weight:600">'+r.tip+'</div>';
+  ruH+='</div></div>';
+});
+document.getElementById('rulesList').innerHTML=ruH;
+
+// ===== WHITEBOARD GUIDE =====
+var wbGuide=[
+  {n:"1",c:"#27AE60",t:"Create a post-it",s:"Right-click on the board \u2192 \u00ab Add a note \u00bb",tip:"Or use the toolbar",tipBg:"#EAF7EF",tipC:"#27AE60"},
+  {n:"2",c:"#E67E22",t:"Move a post-it",s:"Click to select \u2192 Drag to destination",tip:"Hold click down",tipBg:"#FEF5E7",tipC:"#E67E22"},
+  {n:"3",c:"#8E44AD",t:"Resize",s:"Select the post-it \u2192 Pull a corner or edge",tip:"Content adapts automatically",tipBg:"#F4ECF7",tipC:"#8E44AD"},
+  {n:"4",c:"#2980B9",t:"Select an object",s:"Click the arrow tool (toolbar) \u2192 Click the object",tip:"Ctrl+A to select all",tipBg:"#EBF5FB",tipC:"#2980B9"},
+  {n:"5",c:"#0F6E56",t:"Pan around (the hand)",s:"Hold Space bar \u2192 Click-drag to navigate",tip:"Or middle-click + drag",tipBg:"#E6F3EF",tipC:"#0F6E56"},
+  {n:"6",c:"#C0392B",t:"Zoom in / out",s:"Mouse wheel: up = zoom in, down = zoom out",tip:"Ctrl + wheel for precision",tipBg:"#FDF0EE",tipC:"#C0392B"},
+];
+
+var wbH='';
+wbGuide.forEach(function(w){
+  wbH+='<div class="wb-card"><div class="wb-num" style="background:'+w.c+'">'+w.n+'</div><div><div class="wb-title" style="color:'+w.c+'">'+w.t+'</div><div class="wb-steps">'+w.s+'</div><div class="wb-tip" style="background:'+w.tipBg+';color:'+w.tipC+'">'+w.tip+'</div></div></div>';
+});
+document.getElementById('wbList').innerHTML=wbH;
+
+// ===== PARTICIPANTS =====
+var P=[
+{n:"Guillaume Scolan",d:"COMAN",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:false,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:false},
+{n:"Philippe Briand",d:"COMAN",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:true,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Vincent Camaret",d:"COMAN",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:false},
+{n:"Raffaele Ferrillo",d:"COMAN",s1:null,s1g:null,s1r:null,s1c:false,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:false},
+{n:"Nicolas Mithouard",d:"COMAN",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:false},
+{n:"Georges Peyrot",d:"COMAN",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:true,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:false},
+{n:"Virginie Chatelain",d:"COMAN",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:false},
+{n:"Sylvestre Martin",d:"COMAN",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:true,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:true},
+{n:"Julie Belin",d:"COMAN",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:true,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:true},
+{n:"Dorothee Alquier",d:"COMAN",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:true,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:true},
+{n:"Stephane Petitcollin",d:"COMAN",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"Facilitateur",s2r:"Facilitateur",s2c:false},
+{n:"Stephane Louerat",d:"COMAN",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:true,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:true},
+{n:"Melanie Spote",d:"COMAN",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:false},
+{n:"Wesley Lidy",d:"COMAN",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:true,s2:"Leadership Compass",s2g:"Facilitateur",s2r:"Facilitateur",s2c:false},
+{n:"Jee Kin CHIN",d:"SC Leaders",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:false,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:false},
+{n:"Julien PETROCCHI",d:"SC Leaders",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Stephane MUOT",d:"Sites",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:false},
+{n:"David VIARD",d:"Sites",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:false},
+{n:"Matthieu CUVILLIER",d:"Sites",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:false},
+{n:"Thibaud MACHET",d:"Sites",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:false},
+{n:"Thierry THIROUVENKADAM",d:"Sites",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:true},
+{n:"Michel BALARD",d:"Sites",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:false},
+{n:"Gilles BRIARD",d:"Sites",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:false,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:false},
+{n:"Jessica Flint",d:"Sites",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:false,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:false},
+{n:"Nathalie JACQUES",d:"Sites",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:false},
+{n:"Axel MAUVIEUX",d:"Qualite",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:false},
+{n:"Myriam JUDITH",d:"Qualite",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:false},
+{n:"Pascale BEZANCON CHAMPELEY",d:"Qualite",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:false},
+{n:"Annabelle ROY MARTINACHE",d:"Qualite",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:false},
+{n:"Melissa SUBTIL",d:"Qualite",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Benjamin HADET",d:"Dir. Technique",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:false},
+{n:"Julien ARFAOUI",d:"Supply Chain",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:false,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:false},
+{n:"Remy BLANCHIN",d:"Supply Chain",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Sebastien BESSON",d:"Supply Chain",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:false,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:false},
+{n:"Julie BONIGEN",d:"Supply Chain",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:false,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:false},
+{n:"Reynald MARTINEAU",d:"IT",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:true},
+{n:"Jeremy Texier",d:"IT",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:false,s2:null,s2g:null,s2r:null,s2c:false},
+{n:"William Widoot",d:"IT",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:null,s2g:null,s2r:null,s2c:false},
+{n:"Aude Cros",d:"IT",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:null,s2g:null,s2r:null,s2c:false},
+{n:"Julie MOUGIN",d:"Efficience Op.",s1:"Digitalization",s1g:"A3 - Excellence Op. Site",s1r:"Christophine Room",s1c:true,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:true},
+{n:"Sandra GUEGOT",d:"Achats",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:false,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:false},
+{n:"Jonathan MAURICIO",d:"Achats",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Corinne BOUQUET",d:"Achats",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:false,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:false},
+{n:"Vincent DELLACCIO",d:"Innovation",s1:"Digitalization",s1g:"A1 - RFT Process",s1r:"Guillaume Scolan Room",s1c:false,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:false},
+{n:"Morgane KANDELL",d:"Innovation",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:false,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:false},
+{n:"Emmanuelle PIVETEAUD",d:"Innovation",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Laurent Alexandre LOEUNG",d:"RH",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"A2 - Values to life",s2r:"See Rooms",s2c:false},
+{n:"Florence VILLEZ",d:"RH",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:false},
+{n:"Emilie WALCZAK",d:"RH",s1:"Digitalization",s1g:"A2 - Academy/Culture/Change",s1r:"Vincent Camaret Room",s1c:false,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:false},
+{n:"Maud COSSAY",d:"RH",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:"Leadership Compass",s2g:"A3 - Commits & delivers",s2r:"See Rooms",s2c:false},
+{n:"Clemence BOUZOUD",d:"RH",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:"Leadership Compass",s2g:"Facilitateur",s2r:"Facilitateur",s2c:false},
+{n:"Sandra DESSOLIN",d:"Finance",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:"Leadership Compass",s2g:"A1 - Shapes the future",s2r:"See Rooms",s2c:false},
+{n:"Thomas ROGEMONT",d:"Finance",s1:"Digitalization",s1g:"A4 - Excellence Op. Transverse",s1r:"Camelia Room",s1c:false,s2:"Leadership Compass",s2g:"A4 - Develops talents",s2r:"See Rooms",s2c:false},
+{n:"Justine VIAULT",d:"Finance",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false},
+{n:"Yang KAM",d:"Finance",s1:"Forecast Deployment",s1g:"A3 - Low Velocity",s1r:"Pepiniere 3",s1c:false,s2:"Supplier Sync",s2g:"A3 - Low Velocity",s2r:"Pepiniere 3",s2c:false},
+{n:"Nicolas Dujardin",d:"Invite",s1:"Forecast Deployment",s1g:"A1 - Power SKU",s1r:"Pepiniere 1",s1c:false,s2:"Supplier Sync",s2g:"A1 - Power SKU",s2r:"Pepiniere 1",s2c:false},
+{n:"Chris GOH",d:"Invite",s1:"Forecast Deployment",s1g:"A2 - POP",s1r:"Pepiniere 2",s1c:false,s2:"Supplier Sync",s2g:"A2 - POP",s2r:"Pepiniere 2",s2c:false}
+];
+
+var wsS={"Digitalization":{bg:"#E6F1FB",bd:"#1C7293",tx:"#0C447C",lb:"WS1: Digitalization"},"Forecast Deployment":{bg:"#FAECE7",bd:"#B85042",tx:"#712B13",lb:"WS2: Forecast Deployment"},"Supplier Sync":{bg:"#EAF3DE",bd:"#27AE60",tx:"#27500A",lb:"WS3: Supplier Sync"},"Leadership Compass":{bg:"#F4ECF7",bd:"#8E44AD",tx:"#3C3489",lb:"WS4: Leadership Compass"}};
+
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+
+function mkCard(ws,g,r,cap,sl,sc){
+  if(!ws)return'<div class="no-ws">No workshop assigned for this session</div>';
+  var c=wsS[ws]||{bg:"#f5f5f5",bd:"#ccc",tx:"#333",lb:ws};
+  var h='<div class="ws-card2" style="background:'+c.bg+';border-color:'+c.bd+'"><div style="font-size:11px;color:'+sc+';font-weight:600;margin-bottom:3px">'+sl+'</div><div class="wst" style="color:'+c.tx+'">'+c.lb+'</div><div class="wsd" style="color:'+c.tx+'"><b>Group:</b> '+g+'</div><div class="wsd" style="color:'+c.tx+'"><b>Room:</b> '+r+'</div>';
+  if(cap)h+='<div class="captain-b">You are the Platform Captain</div>';
+  return h+'</div>';
+}
+
+var si=document.getElementById("searchInput"),dd=document.getElementById("dropdown"),res=document.getElementById("result"),es=document.getElementById("emptyState");
+
+si.addEventListener("input",function(){
+  var q=norm(si.value);res.innerHTML="";
+  if(q.length<2){dd.style.display="none";es.style.display="block";return;}
+  var m=P.filter(function(p){return norm(p.n).indexOf(q)>=0}).slice(0,8);
+  if(!m.length){dd.style.display="none";return;}
+  if(m.length===1){showP(m[0]);dd.style.display="none";return;}
+  var h="";m.forEach(function(p,i){h+='<div class="dd-item" data-i="'+i+'"><span class="dd-name">'+p.n+'</span><span class="dd-dept">'+p.d+'</span></div>';});
+  dd.innerHTML=h;dd.style.display="block";
+  dd.querySelectorAll(".dd-item").forEach(function(el,i){el.addEventListener("click",function(){showP(m[i]);si.value=m[i].n;dd.style.display="none";});});
+});
+
+function showP(p){
+  es.style.display="none";dd.style.display="none";
+  var ini=p.n.split(" ").map(function(w){return w[0]}).join("").slice(0,2).toUpperCase();
+  var h='<div class="person-hd"><div class="avatar">'+ini+'</div><div class="p-name">'+p.n+'</div><div class="p-dept">'+p.d+'</div></div>';
+  h+='<div style="margin-bottom:14px"><span class="sess-lbl sess1">Session 1 | 13:45 - 14:45</span>';
+  h+=mkCard(p.s1,p.s1g,p.s1r,p.s1c,"Session 1 | 13:45 - 14:45","#1C7293")+'</div>';
+  h+='<div><span class="sess-lbl sess2">Session 2 | 14:45 - 15:45</span>';
+  h+=mkCard(p.s2,p.s2g,p.s2r,p.s2c,"Session 2 | 14:45 - 15:45","#27AE60")+'</div>';
+  res.innerHTML=h;
+}
+
+function toggleFullList(){
+  var fl=document.getElementById("fullList");
+  if(fl.style.display==="none"){
+    var h='<table class="mini-t"><thead><tr><th>Name</th><th>Session 1</th><th>Session 2</th></tr></thead><tbody>';
+    P.forEach(function(p){
+      var c1=p.s1c,c2=p.s2c;
+      var v1=p.s1?(wsS[p.s1]?wsS[p.s1].lb:p.s1)+" - "+p.s1g:"\u2014";
+      var v2=p.s2?(wsS[p.s2]?wsS[p.s2].lb:p.s2)+" - "+p.s2g:"\u2014";
+      if(c1)v1+=" (Capt.)";if(c2)v2+=" (Capt.)";
+      h+='<tr class="'+(c1||c2?"cap":"")+'"><td><strong>'+p.n+'</strong></td><td>'+v1+'</td><td>'+v2+'</td></tr>';
+    });
+    fl.innerHTML=h+'</tbody></table>';fl.style.display="block";
+  }else fl.style.display="none";
+}
+
+document.addEventListener("click",function(e){if(!si.contains(e.target)&&!dd.contains(e.target))dd.style.display="none";});
+
+// ===== LEADERSHIP COMPASS =====
+var compassCats=[
+{name:"Shapes the future",color:"#C0392B",light:"#FDF0EE",aC:2.72,aT:2.47,
+pillars:[
+{p:"Thinks long term",aC:2.89,aT:2.55,items:[
+{n:"Dare to take thoughtful risks",c:[2,2,2,3,4,2.48],t:[1,2,2,3,4,2.30]},
+{n:"Prioritize the collective",c:[1,3,3,4,4,3.15],t:[1,2,3,3,4,2.74]},
+{n:"Balance short vs long-term",c:[2,2.25,3,4,4,3.04],t:[1,2,3,3,4,2.61]}]},
+{p:"Anticipates & leverages market trends",aC:2.31,aT:2.24,items:[
+{n:"Scan signals",c:[1,1,2,3,4,2.07],t:[1,1,2,2,4,1.87]},
+{n:"Transform data to insights",c:[1,2,2,3,4,2.52],t:[1,2,2,3,4,2.39]},
+{n:"Focus on market insights",c:[1,1.5,2,3,4,2.26],t:[1,1,2,3,4,2.17]},
+{n:"Share insights openly",c:[1,2,2,3,4,2.37],t:[1,2,2,3,4,2.52]}]},
+{p:"Encourages innovation & curiosity",aC:2.94,aT:2.61,items:[
+{n:"Accept failure as learning",c:[1,3,3,3,4,2.93],t:[1,2.5,3,3,4,2.83]},
+{n:"Seek inspiration beyond beauty",c:[1,2,3,3,4,2.63],t:[1,2,2,3,4,2.30]},
+{n:"Progress over perfection",c:[1,3,3,4,4,3.15],t:[1,2,2,3,4,2.57]},
+{n:"Embrace simplicity",c:[1,3,3,3.5,4,3.04],t:[1,2,3,3,4,2.65]},
+{n:"Lead with conviction",c:[1,3,3,3,4,2.96],t:[1,2,3,3,4,2.70]}]}],
+analysis:{
+s:[{t:"Defend Clarins' uniqueness",x:"Highest-rated item (C: 3.37, T: 3.13). Brand pride is a shared value."}],
+w:[{t:"Market trends \u2014 strategic blind spot",x:"Weakest pillar for both groups. All 4 sub-categories below 2.5. \"Scan signals\" at C: 2.07, T: 1.87 \u2014 the absolute floor."},
+{t:"Dare to take thoughtful risks",x:"Both groups median at 2.0. Combined with weak market scanning, the org is risk-averse when Vision 2030 requires bold moves."},
+{t:"Customer empathy gap",x:"\"Customer's shoes\" at C: 2.26, T: 2.35 \u2014 brand pride doesn't translate into customer closeness."}],
+g:[{t:"Progress over perfection: +0.58",x:"CODIR thinks they encourage experimentation (3.15) but TEAM scores only 2.57."},
+{t:"Embrace simplicity: +0.39",x:"CODIR believes processes are streamlined (3.04) while TEAM sees complexity (2.65)."}]}},
+
+{name:"Embodies & brings values to life",color:"#1C7293",light:"#E6F1FB",aC:3.27,aT:3.05,
+pillars:[
+{p:"Proudly embodies our uniqueness",aC:2.80,aT:2.67,items:[
+{n:"Defend Clarins' uniqueness",c:[2,3,4,4,4,3.37],t:[2,3,3,4,4,3.13]},
+{n:"Customer's shoes",c:[1,2,2,3,4,2.26],t:[1,1,3,3,4,2.35]},
+{n:"Value unique perspectives",c:[1,2,3,3,4,2.78],t:[1,2,3,3,4,2.52]}]},
+{p:"Builds healthy & respectful environment",aC:3.56,aT:3.47,items:[
+{n:"Promote safe space",c:[2,3,4,4,4,3.63],t:[2,3,4,4,4,3.61]},
+{n:"Speak clearly & respectfully",c:[3,3,4,4,4,3.63],t:[2,3.5,4,4,4,3.70]},
+{n:"Communicate with clarity",c:[2,3,3,4,4,3.33],t:[2,3,3,4,4,3.17]},
+{n:"Foster respect & accountability",c:[3,3,4,4,4,3.67],t:[2,3,3,4,4,3.39]}]},
+{p:"Acts with integrity",aC:3.33,aT:2.91,items:[
+{n:"Explain the why",c:[2,3,4,4,4,3.63],t:[2,3,3,3.5,4,3.09]},
+{n:"Update regularly",c:[2,3,3,4,4,3.15],t:[2,2.5,3,3,4,2.78]},
+{n:"Fully engage & commit",c:[2,3,4,4,4,3.41],t:[2,3,3,4,4,3.13]},
+{n:"Ensure messages understood",c:[2,3,3,4,4,3.15],t:[2,2,3,3,4,2.65]}]}],
+analysis:{
+s:[{t:"Healthy environment \u2014 cultural foundation",x:"Highest pillar for both groups (C: 3.56, T: 3.47, gap only +0.09). Safe space and respect are genuine shared values."},
+{t:"TEAM rates higher on speaking up",x:"\"Speak clearly & respectfully\" T: 3.70 vs C: 3.63. People feel empowered to speak up."}],
+w:[{t:"Customer's shoes remains weak",x:"C: 2.26, T: 2.35. Brand pride doesn't extend to frontline customer empathy."}],
+g:[{t:"Communication cascade problem",x:"\"Explain the why\" +0.54 (C: 3.63 vs T: 3.09) and \"Ensure messages understood\" +0.50 (C: 3.15 vs T: 2.65). CODIR communicates; TEAM doesn't feel heard."},
+{t:"Foster respect & accountability: +0.28",x:"While both high, the gap suggests CODIR may not always model what they expect."}]}},
+
+{name:"Sets ambitions, commits & delivers",color:"#27AE60",light:"#EAF3DE",aC:3.20,aT:2.80,
+pillars:[
+{p:"Sets clear & ambitious objectives",aC:3.21,aT:2.68,items:[
+{n:"Tailor the roadmap",c:[2,3,3,4,4,3.30],t:[1,2,3,3,4,2.52]},
+{n:"Cascade the roadmap",c:[1,3,3,4,4,3.22],t:[1,2,3,3,4,2.65]},
+{n:"Translate objectives",c:[2,3,3,4,4,3.19],t:[1,2,3,3,4,2.65]},
+{n:"Monitor the roadmap",c:[2,3,3,3.5,4,3.15],t:[1,3,3,3,4,2.87]},
+{n:"Ensure alignment",c:[2,3,3,4,4,3.22],t:[1,2,3,3,4,2.74]},
+{n:"Set ambitious goals",c:[2,3,3,4,4,3.19],t:[1,2,3,3,4,2.65]}]},
+{p:"Takes ownership & delivers collectively",aC:3.24,aT:2.96,items:[
+{n:"Disagree & commit",c:[1,3,3,4,4,3.07],t:[1,3,3,3.5,4,3.09]},
+{n:"Align individual & collective",c:[2,3,4,4,4,3.44],t:[1,3,3,3,4,2.96]},
+{n:"Be the ambassador",c:[1,3,3,4,4,3.04],t:[1,2.5,3,4,4,3.04]},
+{n:"Align with courage",c:[2,3,3,4,4,3.30],t:[1,2,3,3,4,2.70]},
+{n:"Honor commitments",c:[2,3,3,4,4,3.33],t:[1,3,3,3.5,4,3.00]}]},
+{p:"Courageous decisions & adapts",aC:3.16,aT:2.78,items:[
+{n:"Address issues quickly",c:[2,3,4,4,4,3.37],t:[2,2.5,3,4,4,3.04]},
+{n:"Make courageous decisions",c:[2,3,3,4,4,3.22],t:[1,2,3,3,4,2.78]},
+{n:"Address issues proactively",c:[2,3,3,4,4,3.07],t:[1,3,3,3,4,2.87]},
+{n:"Take decisive action",c:[2,3,3,4,4,3.22],t:[1,2.5,3,3,4,2.83]},
+{n:"Plan & act strategically",c:[2,2,3,3,4,2.89],t:[1,2,2,3,4,2.39]}]}],
+analysis:{
+s:[{t:"Align individual & collective objectives",x:"Strongest item (C: 3.44, T: 2.96). CODIR connects individual goals to the bigger picture."},
+{t:"Address issues quickly",x:"C: 3.37, T: 3.04. Courageous decision-making is strong at CODIR level."}],
+w:[{t:"Plan and act strategically",x:"Weakest item (C: 2.89, T: 2.39). Gap of +0.50. Intentions don't translate into concrete steps at TEAM level."}],
+g:[{t:"Sets clear objectives: #1 alignment issue (+0.53)",x:"\"Tailor the roadmap\" = +0.78 \u2014 single biggest gap. CODIR believes they set clear objectives; TEAM doesn't experience them as clear."},
+{t:"Align with courage: +0.60",x:"C: 3.30 vs T: 2.70. Realigning actions is a CODIR behavior that doesn't cascade."}]}},
+
+{name:"Inspires & develops talents",color:"#8E44AD",light:"#F4ECF7",aC:3.01,aT:2.71,
+pillars:[
+{p:"Empowers teams to thrive",aC:3.10,aT:2.83,items:[
+{n:"Be demanding & caring",c:[1,3,4,4,4,3.33],t:[1,3,3,3,4,2.91]},
+{n:"Foster collaboration",c:[1,3,3,3.5,4,2.96],t:[1,2,3,3,4,2.83]},
+{n:"Seek understanding",c:[1,3,3,3,4,3.00],t:[1,2,3,3,4,2.74]}]},
+{p:"Recognition & feedback",aC:3.07,aT:2.80,items:[
+{n:"Connect to purpose",c:[1,3,3,4,4,3.33],t:[1,2.5,3,3,4,2.78]},
+{n:"Celebrate success",c:[1,2,3,3,4,2.63],t:[1,2,3,3,4,2.52]},
+{n:"Give honest feedback",c:[1,2.5,3,4,4,3.07],t:[2,2,3,3,4,2.83]},
+{n:"Listen to team suggestions",c:[1,3,3,4,4,3.07],t:[1,3,3,3,4,2.96]},
+{n:"Lead with balance",c:[1,3,3,4,4,3.22],t:[2,2,3,3,4,2.91]}]},
+{p:"Sponsors future talents",aC:2.88,aT:2.50,items:[
+{n:"Design career path",c:[1,2,2,3,4,2.33],t:[1,2,2,3,4,2.17]},
+{n:"Promote growth",c:[1,2,3,3.5,4,2.81],t:[1,2,2,3,4,2.48]},
+{n:"Prioritize team dev.",c:[1,3,3,4,4,3.22],t:[1,2,3,3,4,2.57]},
+{n:"Put team & org first",c:[1,3,3,4,4,3.15],t:[1,2.5,3,3,4,2.78]}]}],
+analysis:{
+s:[{t:"Be demanding & caring",x:"Strongest item (C: 3.33, T: 2.91). CODIR balances high expectations with genuine support."},
+{t:"Disagree & commit: perfect alignment",x:"C: 3.07, T: 3.09 \u2014 TEAM rates above CODIR. Both groups embrace this principle equally."}],
+w:[{t:"Design career path \u2014 talent pipeline at risk",x:"Second-weakest overall (C: 2.33, T: 2.17). Career paths are not actively designed for the capabilities Vision 2030 requires."},
+{t:"Celebrate success",x:"C: 2.63, T: 2.52. Recognition culture is weak \u2014 achievements go unacknowledged."}],
+g:[{t:"Prioritize team development: +0.65",x:"C: 3.22 vs T: 2.57. CODIR believes they support learning; TEAM doesn't experience it."},
+{t:"Connect to purpose: +0.55",x:"C: 3.33 vs T: 2.78. Sense of purpose doesn't cascade from CODIR to TEAM."}]}}
+];
+
+// Render compass
+function renderCompass(){
+  var container=document.getElementById('compassCharts');
+  var html='';
+  compassCats.forEach(function(cat,ci){
+    var delta=(cat.aC-cat.aT).toFixed(2);
+    html+='<div class="cp-cat" style="border-left:4px solid '+cat.color+'">';
+    html+='<div class="cp-cat-hd" onclick="toggleCat('+ci+')">';
+    html+='<div class="dot" style="background:'+cat.color+'"></div>';
+    html+='<div class="title" style="color:'+cat.color+'">'+cat.name+'</div>';
+    html+='<div class="badge" style="background:'+cat.light+';color:'+cat.color+'">C: '+cat.aC.toFixed(2)+' | T: '+cat.aT.toFixed(2)+' | +'+delta+'</div>';
+    html+='<div class="arrow" id="arrow-'+ci+'">\u25BC</div>';
+    html+='</div>';
+    html+='<div id="catBody-'+ci+'" style="display:none">';
+
+    // Pillars with SVG box plots
+    cat.pillars.forEach(function(pil){
+      var pd=(pil.aC-pil.aT).toFixed(2);
+      html+='<div class="cp-pillar-hd"><div class="pname" style="color:'+cat.color+'">'+pil.p+'</div>';
+      html+='<div class="ptag" style="background:'+cat.light+';color:'+cat.color+'">C:'+pil.aC.toFixed(2)+'</div>';
+      html+='<div class="ptag" style="background:'+cat.light+';color:'+cat.color+';opacity:.6">T:'+pil.aT.toFixed(2)+'</div>';
+      html+='<div style="font-size:10px;color:#27AE60;font-weight:600">+'+pd+'</div></div>';
+
+      var n=pil.items.length, W=580, padL=160, padR=50, padT=6, rowH=48, padB=26;
+      var H=padT+n*rowH+padB, plotW=W-padL-padR;
+      function toX(v){return padL+((v-1)/3)*plotW;}
+
+      html+='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block">';
+      [1,2,3,4].forEach(function(v){
+        html+='<line x1="'+toX(v)+'" y1="'+padT+'" x2="'+toX(v)+'" y2="'+(H-padB)+'" stroke="#eee" stroke-width="0.6"/>';
+        html+='<text x="'+toX(v)+'" y="'+(H-padB+13)+'" text-anchor="middle" font-size="8" fill="#bbb" font-family="system-ui">'+v+'</text>';
+      });
+      pil.items.forEach(function(item,i){
+        var cy_c=padT+i*rowH+rowH*0.33, cy_t=padT+i*rowH+rowH*0.67, bH=10;
+        var c=item.c, t=item.t; // [min,q1,med,q3,max,mean]
+        // Label
+        html+='<text x="'+(padL-6)+'" y="'+(padT+i*rowH+rowH/2+1)+'" text-anchor="end" font-size="10" fill="#555" font-family="system-ui">'+item.n+'</text>';
+        // CODIR whisker+box
+        html+='<line x1="'+toX(c[0])+'" y1="'+cy_c+'" x2="'+toX(c[4])+'" y2="'+cy_c+'" stroke="'+cat.color+'" stroke-width="1"/>';
+        html+='<line x1="'+toX(c[0])+'" y1="'+(cy_c-3)+'" x2="'+toX(c[0])+'" y2="'+(cy_c+3)+'" stroke="'+cat.color+'" stroke-width="1"/>';
+        html+='<line x1="'+toX(c[4])+'" y1="'+(cy_c-3)+'" x2="'+toX(c[4])+'" y2="'+(cy_c+3)+'" stroke="'+cat.color+'" stroke-width="1"/>';
+        html+='<rect x="'+toX(c[1])+'" y="'+(cy_c-bH/2)+'" width="'+Math.max(toX(c[3])-toX(c[1]),1)+'" height="'+bH+'" fill="'+cat.light+'" stroke="'+cat.color+'" stroke-width="1" rx="2"/>';
+        html+='<line x1="'+toX(c[2])+'" y1="'+(cy_c-bH/2)+'" x2="'+toX(c[2])+'" y2="'+(cy_c+bH/2)+'" stroke="'+cat.color+'" stroke-width="2"/>';
+        html+='<text x="'+toX(c[5])+'" y="'+(cy_c-bH/2-3)+'" text-anchor="middle" font-size="8" fill="'+cat.color+'" font-weight="600" font-family="system-ui">'+c[5].toFixed(2)+'</text>';
+        // TEAM whisker+box (dashed)
+        html+='<line x1="'+toX(t[0])+'" y1="'+cy_t+'" x2="'+toX(t[4])+'" y2="'+cy_t+'" stroke="'+cat.color+'" stroke-width="1" opacity="0.5"/>';
+        html+='<line x1="'+toX(t[0])+'" y1="'+(cy_t-3)+'" x2="'+toX(t[0])+'" y2="'+(cy_t+3)+'" stroke="'+cat.color+'" stroke-width="1" opacity="0.5"/>';
+        html+='<line x1="'+toX(t[4])+'" y1="'+(cy_t-3)+'" x2="'+toX(t[4])+'" y2="'+(cy_t+3)+'" stroke="'+cat.color+'" stroke-width="1" opacity="0.5"/>';
+        html+='<rect x="'+toX(t[1])+'" y="'+(cy_t-bH/2)+'" width="'+Math.max(toX(t[3])-toX(t[1]),1)+'" height="'+bH+'" fill="none" stroke="'+cat.color+'" stroke-width="1" stroke-dasharray="3 2" rx="2" opacity="0.6"/>';
+        html+='<line x1="'+toX(t[2])+'" y1="'+(cy_t-bH/2)+'" x2="'+toX(t[2])+'" y2="'+(cy_t+bH/2)+'" stroke="'+cat.color+'" stroke-width="2" opacity="0.6"/>';
+        html+='<text x="'+toX(t[5])+'" y="'+(cy_t+bH/2+10)+'" text-anchor="middle" font-size="8" fill="'+cat.color+'" font-family="system-ui" opacity="0.6">'+t[5].toFixed(2)+'</text>';
+      });
+      html+='</svg>';
+    });
+
+    // Analysis insights
+    var a=cat.analysis;
+    html+='<div class="cp-insight">';
+    html+='<div style="font-size:13px;font-weight:600;color:'+cat.color+';margin-bottom:8px">Key insights</div>';
+    if(a.s&&a.s.length){
+      html+='<div class="cp-insight-section"><div class="cp-insight-label" style="color:#27AE60">Strengths</div>';
+      a.s.forEach(function(i){html+='<div class="cp-insight-item"><div class="idot" style="background:#27AE60"></div><div><div class="ititle">'+i.t+'</div><div class="itext">'+i.x+'</div></div></div>';});
+      html+='</div>';
+    }
+    if(a.w&&a.w.length){
+      html+='<div class="cp-insight-section"><div class="cp-insight-label" style="color:#C0392B">Weaknesses</div>';
+      a.w.forEach(function(i){html+='<div class="cp-insight-item"><div class="idot" style="background:#C0392B"></div><div><div class="ititle">'+i.t+'</div><div class="itext">'+i.x+'</div></div></div>';});
+      html+='</div>';
+    }
+    if(a.g&&a.g.length){
+      html+='<div class="cp-insight-section"><div class="cp-insight-label" style="color:#E67E22">CODIR-TEAM gaps</div>';
+      a.g.forEach(function(i){html+='<div class="cp-insight-item"><div class="idot" style="background:#E67E22"></div><div><div class="ititle">'+i.t+'</div><div class="itext">'+i.x+'</div></div></div>';});
+      html+='</div>';
+    }
+    html+='</div>';
+    html+='</div></div>';
+  });
+
+  // Legend
+  html+='<div style="display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:11px;color:#999;flex-wrap:wrap">';
+  html+='<span style="display:flex;align-items:center;gap:4px"><span style="width:16px;height:7px;background:#888;border-radius:2px;display:inline-block"></span> CODIR (solid)</span>';
+  html+='<span style="display:flex;align-items:center;gap:4px"><span style="width:16px;height:7px;border:1px dashed #888;border-radius:2px;display:inline-block"></span> TEAM (dashed)</span>';
+  html+='<span style="display:flex;align-items:center;gap:4px"><span style="font-weight:600;color:#666">2.48</span> = mean</span>';
+  html+='</div>';
+
+  container.innerHTML=html;
+}
+
+function toggleCat(i){
+  var body=document.getElementById('catBody-'+i);
+  var arrow=document.getElementById('arrow-'+i);
+  if(body.style.display==='none'){body.style.display='block';arrow.style.transform='rotate(180deg)';}
+  else{body.style.display='none';arrow.style.transform='rotate(0deg)';}
+}
+
+renderCompass();
+</script>
+</body>
+</html>
